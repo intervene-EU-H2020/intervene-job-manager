@@ -72,10 +72,10 @@ def download_large_file(bucket_name, object_name, out_file):
                 print(r)
 
 #Subroutine to manage selection from several options
-def selectFromDict(options, name):
+def selectFromDict(options, name, atric):
   index = 0
   indexValidList = []
-  print('Select a ' + name + ':')
+  print('Select '+atric+' ' + name + ':')
   for optionName in options:
      index = index + 1
      indexValidList.extend([options[optionName]])
@@ -174,6 +174,17 @@ def select_biobanks():
 ###
 #parameters for job file
 def upload_new_task(_user,conn):
+   # Currently availalble tasks
+   available_tasks = {}
+   available_tasks['prspipe'] = 'prspipe'
+   available_tasks['pgsc_calc'] = 'pgsc_calc'
+   available_tasks['other'] = 'other'
+   available_tasks['none'] = 'none'
+   
+   tasktype=selectFromDict(available_tasks, "analysis pipeline", "an") 
+   if tasktype=="none":
+       return()
+ 
    taskname=input("Give a name for your task:")
    print("\n")
    email=input("Give contact email address: ")
@@ -184,13 +195,7 @@ def upload_new_task(_user,conn):
    storage="allas"
    general_task_description="none"
    print("\n")
-   # Currently availalble tasks
-   available_tasks = {}
-   available_tasks['prspipe'] = 'prspipe'
-   available_tasks['pgsc_calc'] = 'pgsc_calc'
-   available_tasks['other'] = 'other'
-   
-   tasktype=selectFromDict(available_tasks, "Select analysis pipeline")
+
    
    if tasktype == "prspipe":
       general_task_description="Predefined PRSPIPE fucntionality test."
@@ -355,8 +360,8 @@ def update_task_lists(conn):
    if len(all_objs) == 0 :
      return(my_tasks,task_status_info)
    
-   print("Collecting task information.")
-
+   #print("Collecting task information.")
+   print(" ")
    for j in all_objs:
       if re.search("jobs/"+_user+"/", j["name"] ):
          #if re.search("/status/", j["name"] ):
@@ -464,8 +469,8 @@ job_operations['update task list'] = 'update task list'
 job_operations['quit'] = 'quit'
 #biobanks=["HUS","Estonia_Biobank"]
 while dothis != "quit":
-  dothis=selectFromDict(job_operations, "task")
-
+  dothis=selectFromDict(job_operations, "operation", "an")
+  print("")
   if dothis == "update task list":
        my_tasks, task_status_info = update_task_lists(conn)
 
@@ -494,7 +499,7 @@ while dothis != "quit":
           job_dict[jobid] = jobid
               
       job_dict["None"] = "None"
-      jobid=selectFromDict(job_dict, "Select task")          
+      jobid=selectFromDict(job_dict, "task", "a")          
               #print(job_status_objects.split("/")[3])
       if jobid != "None" :
          for j in conn.get_container(bucket)[1]:
@@ -537,7 +542,7 @@ while dothis != "quit":
           task_download_dict[task]=task        
     
      task_download_dict["none"]="none"
-     download_task=selectFromDict(task_download_dict, "task")
+     download_task=selectFromDict(task_download_dict, "task", "a")
 
      # Download the output files or selected task
      if download_task != "none":         
