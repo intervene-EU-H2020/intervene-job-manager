@@ -3,8 +3,8 @@ Help tools to use CSC SD Connect service to manage INTERVENE jobs.
 
 This site contais two software components that interact with the central data repository hosted by INTERVENE Data Coordination Center.  The software components are:
 
-    * iv-request.py (INTERVENE requests). A tool that a researcher can use to upload an analysis request to the SD-Connect to be processed
-    * iv-analyst.py (INTERVENE analyst). A tool that is used by the biobank analysts to download the requests for processing and to upload the results to the SD-Connect so that the original requester can retrieve the results. 
+   * iv-request.py (INTERVENE requests). A tool that a researcher can use to upload an analysis request to the SD-Connect to be processed
+   * iv-analyst.py (INTERVENE analyst). A tool that is used by the biobank analysts to download the requests for processing and to upload the results to the SD-Connect so that the original requester can retrieve the results. 
 
 ## Requirements
 
@@ -43,7 +43,7 @@ Biobank analysts use the iv-analyst.py tool in their local environments to inter
    * display job description file of a task
    * downloading a task to start the analyses
    * upload the results of the task to the data repository
-   * 
+   
 When a biobank analyst selects to start to process the analysis, the interface downloads the pipeline container together with other input data needed. 
 It also downloads an instruction document. Typically this is a text document that describes what biobank data that needs to be collected for the analysis and the commands that need to be executed, but in principle it could be a command script too.
 
