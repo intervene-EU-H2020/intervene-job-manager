@@ -177,7 +177,7 @@ available_biobanks['Estonia Biobank'] = 'Estonia_Biobank'
 available_biobanks['HUS'] = 'HUS'
 available_biobanks['HUNT'] = 'HUNT'
 available_biobanks['FIMM'] = 'FIMM'
-available_biobanks['CSC testing only'] = 'CSC testing only'
+available_biobanks['CSC'] = 'CSC'
 #select right biobank
 biobank=selectFromDict(available_biobanks, "Select your Biobank.")
 

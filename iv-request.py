@@ -20,6 +20,7 @@ import getpass
 
 #return job description information as a python dictionary
 def get_task_json(target_task):
+    #print("jobs/"+_user+"/"+target_task+"/task.json")
     task_json_link=("jobs/"+_user+"/"+target_task+"/task.json")
     task_json=conn.get_object(bucket, task_json_link)[1]
     task_description=json.loads(task_json)
@@ -121,13 +122,26 @@ def set_prspipe_parameters():
       }
       ]
       requirements=["singularity"]
-      
-      return(inputs, output_names, instructions, requirements)
+      resources= {
+        "cpuCores": 4,
+        "ramGb": 8.0,
+        "diskGb": 100.0,
+        "timeHours": 2, 
+        "preemptible": False
+      },
+      return(inputs, output_names, instructions, requirements, resources)
   
 ## parameters for pgsc_calc test run
 def set_pgsc_calc_parameters():
       requirements=["singularity", "nextflow"]
       #     inputs=["2004504-prspipe/prspipe_8.7.22.tar"]
+      resources= {
+        "cpuCores": 4,
+        "ramGb": 16.0,
+        "diskGb": 100.0,
+        "timeHours": 2, 
+        "preemptible": False
+      },
       inputs=[
         {
         "name": "pgsc_calc_7.10.22.tar",
@@ -140,20 +154,19 @@ def set_pgsc_calc_parameters():
         }
         ]
       output_names=["pgsc_calc_results.zip"]
-      #input file
-
-      
+      #input file    
       instructions=[
       {
        "bucket": "2004504-pgsc_calc",
        "object": "/pgsc_calc_README.md"
       }   
       ]
-      return(inputs, output_names, instructions, requirements)
+ 
+      return(inputs, output_names, instructions, requirements, resources)
 
 ## tool to pick target biobanks       
 def select_biobanks():
-    all_biobanks=["HUS", "Estonia_Biobank", "HUNT", "FIMM", "CSC testing only"]
+    all_biobanks=["HUS", "Estonia_Biobank", "HUNT", "FIMM", "CSC"]
     print("Select target biobanks:")
     run_selection=True
     while run_selection: 
@@ -204,6 +217,7 @@ def upload_new_task(_user,conn):
       output_names=task_parameters[1]
       instructions=task_parameters[2]
       requirements=task_parameters[3]
+      resources=task_parameters[4]
    
    if tasktype == "pgsc_calc":
       general_task_description="Predefined PGSC_CALC fucntionality test."
@@ -212,6 +226,7 @@ def upload_new_task(_user,conn):
       output_names=task_parameters[1]
       instructions=task_parameters[2]
       requirements=task_parameters[3]
+      resources=task_parameters[4]
       
       input_file=input("Give pgsc_calc input data file: ")
       pseudofolder=("jobs/"+workdir+"/input")
@@ -277,7 +292,22 @@ def upload_new_task(_user,conn):
               requirement=input("Give requirement: ")
               requirements.append(requirement)
  
-        #Define instructions
+       #resource request
+       print("Give the resouce requirements of the task.")
+       cores = input("How many cores should be used(default 1):") or 1
+       ram = input("How much memory is needed (GB, default 2):") or 2
+       disk=input("Hom much disk space is needed (GB, default 20): ") or 20
+       hours=input("Maximum runtime in hours (default 1): ") or 1
+       
+       resources= {
+         "cpuCores": cores,
+         "ramGb": ram,
+         "diskGb": disk,
+         "timeHours": hours, 
+         "preemptible": False
+       },
+ 
+       #Define instructions
        print("\n")
        print("Give the file that contains instructios to run the task.")
        instructions_file=input("Give instructions data file: ")
@@ -315,6 +345,7 @@ def upload_new_task(_user,conn):
          "date": str(datetime.datetime.now()),
          "biobanks": available_biobanks,
          "requirements": requirements,
+         "resources": resources,
          "storageserver": storage,
          "inputs": inputs,        
          "outputs": outputs,
@@ -420,15 +451,11 @@ def update_task_lists(conn):
 ####################################################################
 # Main program starts here
 #
-
-
-#parameters for allas connection
-
 _authurl = 'https://pouta.csc.fi:5001/v3'
 _auth_version = '3'
 _user = input('CSC username: \n')
 _key = getpass.getpass('CSC password: \n')
-
+storage="allas"
 
 _os_options = {
     'user_domain_name': 'Default',
@@ -436,6 +463,8 @@ _os_options = {
     'project_name': 'project_2004504'
 }
 _project = _os_options["project_name"]
+bucket=(_project+"-intervene-tasks")
+
 
 conn = swiftclient.Connection(
     authurl=_authurl,
@@ -444,7 +473,22 @@ conn = swiftclient.Connection(
     os_options=_os_options,
     auth_version=_auth_version
 )
-bucket=(_project+"-intervene-tasks")
+
+print("parameters for allas connection")
+
+#_authurl = 'https://pouta.csc.fi:5001/v3'
+#_auth_version = '3'
+#_user = input('CSC username: \n')
+#_key = getpass.getpass('CSC password: \n')
+#
+#
+#_os_options = {
+#    'user_domain_name': 'Default',
+#    'project_domain_name': 'Default',
+#    'project_name': 'project_2004504'
+#}
+
+
 
 dothis = "start"
 
